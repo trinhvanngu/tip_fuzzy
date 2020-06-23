@@ -1,0 +1,104 @@
+# https://rpubs.com/rahulSaha/Fuzzy-CMeansClustering
+library(ppclust)
+library(ggpubr)
+library(factoextra)
+
+dt <- read.table("tip.tsv", header=T)
+colx <- c("Service", "Food")
+x <- dt[colx]
+
+# plot before clustering
+pdf("pairs.pdf")
+pairs(x)
+dev.off()
+
+# clustering using fuzzy c mean
+res.fcm <- fcm(x, centers=3)
+
+# kmean
+res.fcm2 <- ppclust2(res.fcm, "kmeans")
+# plot cluster of kmean
+pdf("fviz_cluster_kmean.pdf")
+fviz_cluster(res.fcm2, data=x, ellipse.type="convex", palette="jco", repel=TRUE, xlab="Service", ylab="Food")
+dev.off()
+# kmean is scrip
+res.fcm2
+
+# membership matrix
+m <- as.data.frame(res.fcm$u)
+# summary
+summary(res.fcm)
+# plot after clustering
+pdf("plotcluster.pdf")
+plotcluster(res.fcm, cp=3, trans=TRUE)
+dev.off()
+# assign cluster
+dt$Cluster <- as.factor(res.fcm$cluster)
+# plot scatter plot with boxplot
+pdf("ggscatterhist_boxplot.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Cluster", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "boxplot",
+ ggtheme = theme_bw()
+)
+dev.off()
+# plot scatter plot with density
+pdf("ggscatterhist_density.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Cluster", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "density",
+ ggtheme = theme_bw()
+)
+dev.off()
+# plot scatter plot with histogram
+pdf("ggscatterhist_histogram.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Cluster", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "histogram",
+ ggtheme = theme_bw()
+)
+dev.off()
+
+
+# assign label to class
+dt$Class <- "GOOD"
+dt[dt$Cluster=="1", "Class"] <- "OK"
+dt[dt$Cluster=="2", "Class"] <- "BAD"
+dt$Class <- as.factor(dt$Class)
+# plot scatter plot with boxplot
+pdf("ggscatterhist_boxplot_class.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Class", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "boxplot",
+ ggtheme = theme_bw()
+)
+dev.off()
+# plot scatter plot with density
+pdf("ggscatterhist_density_class.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Class", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "density",
+ ggtheme = theme_bw()
+)
+dev.off()
+# plot scatter plot with histogram
+pdf("ggscatterhist_histogram_class.pdf")
+ggscatterhist(
+ dt, x = "Service", y = "Food",
+ color = "Class", size = 3, alpha = 0.6,
+ palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+ margin.plot = "histogram",
+ ggtheme = theme_bw()
+)
+dev.off()
+
